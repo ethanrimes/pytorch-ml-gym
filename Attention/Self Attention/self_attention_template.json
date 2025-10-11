@@ -1,0 +1,254 @@
+{
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "# Self-Attention Mechanism: Scaled Dot-Product Attention\n",
+        "\n",
+        "## Problem Statement\n",
+        "Implement the **scaled dot-product attention** mechanism from scratch, which is the core building block of Transformer architectures. Your implementation should compute attention scores and weighted outputs for input sequences.\n",
+        "\n",
+        "## Objectives\n",
+        "1. Implement scaled dot-product attention without using pre-built attention layers\n",
+        "2. Generate random sequences as input data\n",
+        "3. Verify numerical correctness of the implementation\n",
+        "4. Visualize attention scores to understand the attention patterns\n",
+        "\n",
+        "## Background\n",
+        "Scaled dot-product attention computes:\n",
+        "```\n",
+        "Attention(Q, K, V) = softmax(QK^T / sqrt(d_k)) * V\n",
+        "```\n",
+        "where:\n",
+        "- Q (Query), K (Key), V (Value) are input matrices\n",
+        "- d_k is the dimension of the key vectors\n",
+        "- The scaling factor (sqrt(d_k)) prevents gradients from vanishing for large dimensions"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Step 1: Data Acquisition\n",
+        "\n",
+        "**Task**: Generate synthetic sequential data for testing the attention mechanism.\n",
+        "\n",
+        "**Requirements**:\n",
+        "- Create random Query (Q), Key (K), and Value (V) matrices\n",
+        "- Shape: (batch_size, sequence_length, embedding_dim)\n",
+        "- Use numpy for random generation with a fixed seed for reproducibility\n",
+        "- Typical dimensions: batch_size=2, sequence_length=5, embedding_dim=64"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# Import required libraries\n",
+        "# TODO: Import numpy, matplotlib, and any other necessary libraries"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# Generate random input sequences\n",
+        "# TODO: Set random seed for reproducibility\n",
+        "# TODO: Define dimensions (batch_size, seq_length, d_model)\n",
+        "# TODO: Generate random Q, K, V matrices using numpy"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Step 2: Data Preprocessing\n",
+        "\n",
+        "**Task**: Prepare and validate the input data.\n",
+        "\n",
+        "**Requirements**:\n",
+        "- Verify shapes of Q, K, V matrices\n",
+        "- Ensure Q and K have the same embedding dimension (d_k)\n",
+        "- Print shapes and basic statistics of the generated data"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# Validate input data\n",
+        "# TODO: Print shapes of Q, K, V\n",
+        "# TODO: Verify dimensional compatibility\n",
+        "# TODO: Display basic statistics (mean, std) of the matrices"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Step 3: Model Implementation\n",
+        "\n",
+        "**Task**: Implement scaled dot-product attention from scratch.\n",
+        "\n",
+        "**Requirements**:\n",
+        "- Implement a function `scaled_dot_product_attention(Q, K, V, mask=None)`\n",
+        "- Compute attention scores: scores = Q @ K^T\n",
+        "- Apply scaling: scores = scores / sqrt(d_k)\n",
+        "- Apply softmax to get attention weights\n",
+        "- Compute weighted sum: output = attention_weights @ V\n",
+        "- Return both output and attention weights\n",
+        "- Support optional masking for padding or causal attention"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# Implement scaled dot-product attention\n",
+        "# TODO: Define scaled_dot_product_attention function\n",
+        "# TODO: Implement matrix multiplication Q @ K^T\n",
+        "# TODO: Apply scaling factor\n",
+        "# TODO: Apply optional mask (if provided)\n",
+        "# TODO: Apply softmax along the last dimension\n",
+        "# TODO: Compute output as attention_weights @ V\n",
+        "# TODO: Return output and attention_weights"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Step 4: Execution and Testing\n",
+        "\n",
+        "**Task**: Apply the attention mechanism and verify correctness.\n",
+        "\n",
+        "**Requirements**:\n",
+        "- Call the attention function with generated Q, K, V\n",
+        "- Verify output shape matches expected dimensions\n",
+        "- Check that attention weights sum to 1 along the sequence dimension\n",
+        "- Test with a simple example to verify correctness"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# Apply attention mechanism\n",
+        "# TODO: Call scaled_dot_product_attention with Q, K, V\n",
+        "# TODO: Print output shape\n",
+        "# TODO: Verify attention weights sum to 1"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# Numerical correctness test\n",
+        "# TODO: Create a simple test case with known expected behavior\n",
+        "# TODO: Verify attention weights are non-negative\n",
+        "# TODO: Verify output is a weighted combination of V"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Step 5: Evaluation and Visualization\n",
+        "\n",
+        "**Task**: Visualize attention patterns to understand the mechanism.\n",
+        "\n",
+        "**Requirements**:\n",
+        "- Create a heatmap of attention weights for one sample\n",
+        "- Label axes appropriately (Query positions vs Key positions)\n",
+        "- Use a color scale to show attention strength\n",
+        "- Interpret the attention pattern\n",
+        "- Compare attention patterns across different samples in the batch"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# Visualize attention scores\n",
+        "# TODO: Create heatmap using matplotlib or seaborn\n",
+        "# TODO: Plot attention weights for the first sample in batch\n",
+        "# TODO: Add labels, colorbar, and title\n",
+        "# TODO: Display the plot"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# Additional analysis\n",
+        "# TODO: Compute and display attention statistics\n",
+        "# TODO: Show which positions attend most strongly to which other positions\n",
+        "# TODO: Optional: Test with causal mask to see autoregressive attention"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Bonus: Causal Masking\n",
+        "\n",
+        "**Task**: Implement and test causal (autoregressive) masking.\n",
+        "\n",
+        "**Requirements**:\n",
+        "- Create a causal mask that prevents positions from attending to future positions\n",
+        "- Apply the mask in the attention function\n",
+        "- Visualize the masked attention pattern"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# Implement causal masking\n",
+        "# TODO: Create lower triangular mask\n",
+        "# TODO: Apply attention with causal mask\n",
+        "# TODO: Visualize masked attention weights"
+      ]
+    }
+  ],
+  "metadata": {
+    "kernelspec": {
+      "display_name": "Python 3",
+      "language": "python",
+      "name": "python3"
+    },
+    "language_info": {
+      "codemirror_mode": {
+        "name": "ipython",
+        "version": 3
+      },
+      "file_extension": ".py",
+      "mimetype": "text/x-python",
+      "name": "python",
+      "nbconvert_exporter": "python",
+      "pygments_lexer": "ipython3",
+      "version": "3.8.0"
+    }
+  },
+  "nbformat": 4,
+  "nbformat_minor": 4
+}

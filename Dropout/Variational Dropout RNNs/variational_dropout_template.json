@@ -1,0 +1,329 @@
+{
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "# Problem: Variational Dropout in RNNs for Language Modeling\n",
+        "\n",
+        "## Problem Statement\n",
+        "You are tasked with implementing **Variational Dropout** (also known as locked dropout) for an LSTM network on a language modeling task. Unlike naive dropout which samples a new dropout mask at each timestep, variational dropout uses the **same dropout mask across all timesteps** in a sequence, which has been shown to improve regularization in RNNs.\n",
+        "\n",
+        "### Objectives\n",
+        "1. Implement a custom LSTM with **Variational Dropout** (locked dropout across time steps)\n",
+        "2. Implement a baseline LSTM with **Naive Dropout** (standard dropout at each timestep)\n",
+        "3. Train both models on a language modeling dataset (Penn Treebank)\n",
+        "4. Compare the performance and training stability of both approaches\n",
+        "5. Visualize training curves to demonstrate the difference\n",
+        "\n",
+        "### Requirements\n",
+        "- Implement `VariationalDropout` layer that maintains the same mask across timesteps\n",
+        "- Create two LSTM models: one with variational dropout, one with naive dropout\n",
+        "- Use perplexity as the evaluation metric\n",
+        "- Visualize and compare training/validation loss curves\n",
+        "\n",
+        "### Dataset\n",
+        "**Penn Treebank (PTB)**: A standard benchmark for language modeling containing Wall Street Journal articles.\n",
+        "\n",
+        "<details>\n",
+        "  <summary>💡 Hint</summary>\n",
+        "  \n",
+        "  **Variational Dropout**: Sample the dropout mask once per sequence and apply it at every timestep. This can be implemented by generating a mask of shape `(batch_size, hidden_size)` and reusing it.\n",
+        "  \n",
+        "  **Naive Dropout**: Use standard PyTorch dropout which samples a new mask at each forward pass.\n",
+        "  \n",
+        "  **Key Difference**: Variational dropout prevents the network from learning to rely on specific timestep patterns, leading to better generalization.\n",
+        "</details>"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Step 1: Import Libraries and Setup"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# Import necessary libraries\n",
+        "# TODO: Import torch, nn, optim, and other required libraries\n"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Step 2: Data Acquisition and Preprocessing\n",
+        "\n",
+        "Load the Penn Treebank dataset and prepare it for language modeling.\n",
+        "- Download PTB dataset\n",
+        "- Create vocabulary\n",
+        "- Tokenize and numericalize text\n",
+        "- Create data loaders with proper batching"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# Download and load Penn Treebank dataset\n",
+        "# TODO: Implement data loading\n"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# Create vocabulary and tokenization\n",
+        "# TODO: Build vocabulary from training data\n"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# Prepare data loaders\n",
+        "# TODO: Create batched sequences for training\n"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Step 3: Model Implementation\n",
+        "\n",
+        "### 3.1: Implement Variational Dropout Layer"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "class VariationalDropout(nn.Module):\n",
+        "    \"\"\"\n",
+        "    Implements variational dropout (locked dropout).\n",
+        "    The same dropout mask is used across all timesteps.\n",
+        "    \"\"\"\n",
+        "    def __init__(self, dropout_rate=0.5):\n",
+        "        # TODO: Initialize dropout rate\n",
+        "        pass\n",
+        "    \n",
+        "    def forward(self, x):\n",
+        "        \"\"\"\n",
+        "        Args:\n",
+        "            x: Input tensor of shape (batch_size, seq_len, hidden_size)\n",
+        "        Returns:\n",
+        "            Dropped out tensor with same shape\n",
+        "        \"\"\"\n",
+        "        # TODO: Implement variational dropout\n",
+        "        # Sample mask once and apply to all timesteps\n",
+        "        pass"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "### 3.2: Implement LSTM with Variational Dropout"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "class LSTMVariational(nn.Module):\n",
+        "    \"\"\"\n",
+        "    LSTM Language Model with Variational Dropout\n",
+        "    \"\"\"\n",
+        "    def __init__(self, vocab_size, embed_size, hidden_size, num_layers, dropout=0.5):\n",
+        "        # TODO: Initialize embedding, LSTM, and output layers\n",
+        "        # TODO: Add variational dropout\n",
+        "        pass\n",
+        "    \n",
+        "    def forward(self, x, hidden=None):\n",
+        "        # TODO: Implement forward pass with variational dropout\n",
+        "        pass"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "### 3.3: Implement LSTM with Naive Dropout"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "class LSTMNaive(nn.Module):\n",
+        "    \"\"\"\n",
+        "    LSTM Language Model with Naive (Standard) Dropout\n",
+        "    \"\"\"\n",
+        "    def __init__(self, vocab_size, embed_size, hidden_size, num_layers, dropout=0.5):\n",
+        "        # TODO: Initialize embedding, LSTM, and output layers\n",
+        "        # TODO: Add standard dropout\n",
+        "        pass\n",
+        "    \n",
+        "    def forward(self, x, hidden=None):\n",
+        "        # TODO: Implement forward pass with naive dropout\n",
+        "        pass"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Step 4: Training\n",
+        "\n",
+        "### 4.1: Define Training Function"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "def train_epoch(model, train_loader, criterion, optimizer, device):\n",
+        "    \"\"\"\n",
+        "    Train for one epoch\n",
+        "    \"\"\"\n",
+        "    # TODO: Implement training loop\n",
+        "    pass"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "def evaluate(model, valid_loader, criterion, device):\n",
+        "    \"\"\"\n",
+        "    Evaluate model on validation set\n",
+        "    \"\"\"\n",
+        "    # TODO: Implement evaluation loop\n",
+        "    pass"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "### 4.2: Train Both Models"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# Initialize models\n",
+        "# TODO: Create variational and naive dropout models\n",
+        "\n",
+        "# Define loss function and optimizers\n",
+        "# TODO: Use CrossEntropyLoss and Adam optimizer\n",
+        "\n",
+        "# Train both models\n",
+        "# TODO: Implement training loop for both models\n"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Step 5: Evaluation and Visualization\n",
+        "\n",
+        "### 5.1: Compare Perplexity"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# Calculate and compare final perplexity\n",
+        "# TODO: Compute perplexity = exp(loss) for both models\n"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "### 5.2: Visualize Training Curves"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# Plot training and validation loss curves\n",
+        "# TODO: Create comparative plots showing:\n",
+        "#   - Training loss over epochs\n",
+        "#   - Validation loss over epochs\n",
+        "#   - Perplexity comparison\n"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "### 5.3: Analysis and Conclusions"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# Print summary statistics and analysis\n",
+        "# TODO: Compare:\n",
+        "#   - Final perplexity\n",
+        "#   - Training stability (variance in loss)\n",
+        "#   - Convergence speed\n"
+      ]
+    }
+  ],
+  "metadata": {
+    "kernelspec": {
+      "display_name": "Python 3",
+      "language": "python",
+      "name": "python3"
+    },
+    "language_info": {
+      "codemirror_mode": {
+        "name": "ipython",
+        "version": 3
+      },
+      "file_extension": ".py",
+      "mimetype": "text/x-python",
+      "name": "python",
+      "nbconvert_exporter": "python",
+      "version": "3.10.0"
+    }
+  },
+  "nbformat": 4,
+  "nbformat_minor": 2
+}

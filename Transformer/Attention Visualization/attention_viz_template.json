@@ -1,0 +1,342 @@
+{
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "# Problem: Attention Visualization in Transformers\n",
+        "\n",
+        "### Problem Statement\n",
+        "You are tasked with implementing a **Transformer model** from scratch and training it on a synthetic sequence-to-sequence task. After training, you must **visualize the attention patterns** learned by different attention heads to understand how the model processes input sequences.\n",
+        "\n",
+        "### Requirements\n",
+        "1. **Data Acquisition**: Generate synthetic sequence data for a simple task (e.g., sequence copying, reversal, or sorted sequence prediction).\n",
+        "2. **Data Wrangling**: Prepare the synthetic data with proper tokenization and padding.\n",
+        "3. **Model Implementation**: Implement a Transformer model with multi-head attention from scratch using PyTorch.\n",
+        "4. **Training**: Train the model on the synthetic task using appropriate loss function and optimizer.\n",
+        "5. **Evaluation**: Evaluate model performance and visualize attention maps for different heads.\n",
+        "\n",
+        "### Constraints\n",
+        "- Implement the Transformer architecture including multi-head attention mechanism.\n",
+        "- Generate at least 1000 training examples.\n",
+        "- Use at least 2 attention heads.\n",
+        "- Visualize attention patterns using heatmaps.\n",
+        "\n",
+        "### Learning Objectives\n",
+        "- Understand the internal mechanics of Transformer attention.\n",
+        "- Learn how different attention heads specialize in different patterns.\n",
+        "- Practice implementing complex neural architectures from scratch.\n",
+        "\n",
+        "<details>\n",
+        "  <summary>💡 Hint</summary>\n",
+        "  Start with a simple sequence task like copying or reversing sequences. Implement scaled dot-product attention first, then build multi-head attention on top. Use matplotlib or seaborn to create attention heatmaps. Extract attention weights during the forward pass for visualization.\n",
+        "</details>"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Step 1: Data Acquisition\n",
+        "\n",
+        "Generate synthetic sequence data for training the Transformer model.\n",
+        "\n",
+        "**Task**: Create a dataset where the model learns to reverse sequences of integers.\n",
+        "- Input: Random sequences of integers (e.g., [1, 5, 3, 7, 2])\n",
+        "- Output: Reversed sequences (e.g., [2, 7, 3, 5, 1])\n",
+        "- Vocabulary size: 10-20 tokens\n",
+        "- Sequence length: 5-10 tokens\n",
+        "- Dataset size: 1000+ examples"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "import torch\n",
+        "import torch.nn as nn\n",
+        "import torch.optim as optim\n",
+        "import numpy as np\n",
+        "import matplotlib.pyplot as plt\n",
+        "import seaborn as sns\n",
+        "from torch.utils.data import Dataset, DataLoader\n",
+        "\n",
+        "# Set random seeds for reproducibility\n",
+        "torch.manual_seed(42)\n",
+        "np.random.seed(42)"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# TODO: Generate synthetic sequence reversal dataset\n",
+        "# Define vocabulary size, sequence length, and number of examples\n",
+        "# Create function to generate random sequences and their reversed versions"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Step 2: Data Wrangling\n",
+        "\n",
+        "Prepare the data for training:\n",
+        "- Add special tokens (PAD, SOS, EOS)\n",
+        "- Create PyTorch Dataset and DataLoader\n",
+        "- Implement proper batching and padding"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# TODO: Define special tokens and create vocabulary mapping\n",
+        "# PAD_TOKEN = 0\n",
+        "# SOS_TOKEN = ...\n",
+        "# EOS_TOKEN = ..."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# TODO: Create PyTorch Dataset class\n",
+        "class SequenceDataset(Dataset):\n",
+        "    def __init__(self, sequences, targets):\n",
+        "        pass\n",
+        "    \n",
+        "    def __len__(self):\n",
+        "        pass\n",
+        "    \n",
+        "    def __getitem__(self, idx):\n",
+        "        pass"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# TODO: Create DataLoader with appropriate batch size"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Step 3: Model Implementation\n",
+        "\n",
+        "Implement a Transformer model with the following components:\n",
+        "1. **Positional Encoding**: Add position information to embeddings\n",
+        "2. **Multi-Head Attention**: Implement scaled dot-product attention with multiple heads\n",
+        "3. **Encoder**: Stack of attention and feedforward layers\n",
+        "4. **Decoder**: Stack of masked attention, encoder-decoder attention, and feedforward layers\n",
+        "5. **Output Layer**: Linear projection to vocabulary"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# TODO: Implement Positional Encoding\n",
+        "class PositionalEncoding(nn.Module):\n",
+        "    def __init__(self, d_model, max_len=100):\n",
+        "        pass\n",
+        "    \n",
+        "    def forward(self, x):\n",
+        "        pass"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# TODO: Implement Multi-Head Attention\n",
+        "class MultiHeadAttention(nn.Module):\n",
+        "    def __init__(self, d_model, num_heads):\n",
+        "        pass\n",
+        "    \n",
+        "    def forward(self, query, key, value, mask=None):\n",
+        "        # Return output and attention weights for visualization\n",
+        "        pass"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# TODO: Implement Transformer Encoder Layer\n",
+        "class TransformerEncoderLayer(nn.Module):\n",
+        "    def __init__(self, d_model, num_heads, d_ff, dropout=0.1):\n",
+        "        pass\n",
+        "    \n",
+        "    def forward(self, x, mask=None):\n",
+        "        pass"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# TODO: Implement Transformer Decoder Layer\n",
+        "class TransformerDecoderLayer(nn.Module):\n",
+        "    def __init__(self, d_model, num_heads, d_ff, dropout=0.1):\n",
+        "        pass\n",
+        "    \n",
+        "    def forward(self, x, enc_output, src_mask=None, tgt_mask=None):\n",
+        "        pass"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# TODO: Implement complete Transformer model\n",
+        "class Transformer(nn.Module):\n",
+        "    def __init__(self, vocab_size, d_model, num_heads, num_layers, d_ff, dropout=0.1):\n",
+        "        pass\n",
+        "    \n",
+        "    def forward(self, src, tgt, src_mask=None, tgt_mask=None):\n",
+        "        # Return predictions and attention weights\n",
+        "        pass"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Step 4: Training\n",
+        "\n",
+        "Train the Transformer model:\n",
+        "- Loss function: Cross-entropy loss\n",
+        "- Optimizer: Adam with learning rate scheduling\n",
+        "- Track training loss and accuracy\n",
+        "- Implement teacher forcing for decoder training"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# TODO: Initialize model, loss function, and optimizer"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# TODO: Implement training loop with teacher forcing\n",
+        "def train_epoch(model, dataloader, criterion, optimizer, device):\n",
+        "    pass"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# TODO: Train the model for multiple epochs"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Step 5: Evaluation and Attention Visualization\n",
+        "\n",
+        "Evaluate the model and visualize attention patterns:\n",
+        "1. Test model accuracy on validation set\n",
+        "2. Extract attention weights from different heads\n",
+        "3. Create heatmaps showing attention patterns\n",
+        "4. Analyze how different heads focus on different parts of the input"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# TODO: Evaluate model accuracy"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# TODO: Extract attention weights for a sample input\n",
+        "def get_attention_weights(model, src, tgt, device):\n",
+        "    pass"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# TODO: Visualize attention maps for different heads\n",
+        "def plot_attention_maps(attention_weights, src_tokens, tgt_tokens):\n",
+        "    pass"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# TODO: Generate visualizations for multiple examples\n",
+        "# Compare attention patterns across different heads"
+      ]
+    }
+  ],
+  "metadata": {
+    "kernelspec": {
+      "display_name": "Python 3",
+      "language": "python",
+      "name": "python3"
+    },
+    "language_info": {
+      "codemirror_mode": {
+        "name": "ipython",
+        "version": 3
+      },
+      "file_extension": ".py",
+      "mimetype": "text/x-python",
+      "name": "python",
+      "nbconvert_exporter": "python",
+      "pygments_lexer": "ipython3",
+      "version": "3.8.0"
+    }
+  },
+  "nbformat": 4,
+  "nbformat_minor": 4
+}

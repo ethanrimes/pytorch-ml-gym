@@ -1,0 +1,316 @@
+{
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "# Problem: Dropout Regularization in Feedforward Neural Networks\n",
+        "\n",
+        "## Problem Statement\n",
+        "You are tasked with investigating the effect of **dropout regularization** on the generalization performance of feedforward neural networks. Using the **MNIST** dataset, you will:\n",
+        "\n",
+        "1. Implement a feedforward neural network for digit classification\n",
+        "2. Train multiple models with different dropout rates (0.0, 0.2, 0.3, 0.5, 0.7)\n",
+        "3. Compare training and validation loss curves to identify overfitting\n",
+        "4. Determine the optimal dropout rate for best generalization\n",
+        "\n",
+        "### Learning Objectives\n",
+        "- Understand how dropout prevents overfitting\n",
+        "- Analyze the tradeoff between model capacity and regularization\n",
+        "- Interpret training dynamics through loss curves\n",
+        "- Select hyperparameters based on validation performance\n",
+        "\n",
+        "### Requirements\n",
+        "1. **Data Acquisition**: Load and preprocess the MNIST dataset\n",
+        "2. **Data Wrangling**: Normalize pixel values and create train/validation splits\n",
+        "3. **Model Implementation**: Build a feedforward network with configurable dropout\n",
+        "4. **Training**: Train models with various dropout rates using cross-entropy loss\n",
+        "5. **Evaluation**: Plot loss curves and compare test accuracies\n",
+        "\n",
+        "<details>\n",
+        "  <summary>💡 Hint</summary>\n",
+        "  Use `nn.Dropout()` layers between fully connected layers. Remember that dropout behaves differently during training vs evaluation (use `model.train()` and `model.eval()`). Track both training and validation losses at each epoch for plotting.\n",
+        "</details>"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Step 1: Data Acquisition\n",
+        "\n",
+        "Load the **MNIST** dataset using `torchvision.datasets`. This dataset contains 70,000 grayscale images of handwritten digits (0-9), each 28×28 pixels."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 1,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "import torch\n",
+        "import torch.nn as nn\n",
+        "import torch.optim as optim\n",
+        "import torchvision\n",
+        "import torchvision.transforms as transforms\n",
+        "from torch.utils.data import DataLoader, random_split\n",
+        "import matplotlib.pyplot as plt\n",
+        "import numpy as np"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 2,
+      "metadata": {},
+      "outputs": [
+        {
+          "name": "stdout",
+          "output_type": "stream",
+          "text": [
+            "Downloading http://yann.lecun.com/exdb/mnist/train-images-idx3-ubyte.gz\n",
+            "Downloading http://yann.lecun.com/exdb/mnist/train-labels-idx1-ubyte.gz\n",
+            "Downloading http://yann.lecun.com/exdb/mnist/t10k-images-idx3-ubyte.gz\n",
+            "Downloading http://yann.lecun.com/exdb/mnist/t10k-labels-idx1-ubyte.gz\n",
+            "Processing...\n",
+            "Done!\n"
+          ]
+        }
+      ],
+      "source": [
+        "# Load MNIST dataset\n",
+        "transform = transforms.Compose([\n",
+        "    transforms.ToTensor(),\n",
+        "])\n",
+        "\n",
+        "train_dataset = torchvision.datasets.MNIST(root='./data', train=True, download=True, transform=transform)\n",
+        "test_dataset = torchvision.datasets.MNIST(root='./data', train=False, download=True, transform=transform)\n",
+        "\n",
+        "print(f\"Training samples: {len(train_dataset)}\")\n",
+        "print(f\"Test samples: {len(test_dataset)}\")"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Step 2: Data Wrangling\n",
+        "\n",
+        "Preprocess the data:\n",
+        "- Normalize pixel values to [0, 1] range (done automatically by ToTensor)\n",
+        "- Split training data into train and validation sets (80/20 split)\n",
+        "- Create DataLoaders with appropriate batch size"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 3,
+      "metadata": {},
+      "outputs": [
+        {
+          "name": "stdout",
+          "output_type": "stream",
+          "text": [
+            "Training samples: 48000\n",
+            "Validation samples: 12000\n",
+            "Test samples: 10000\n"
+          ]
+        }
+      ],
+      "source": [
+        "# Split training dataset into train and validation (80/20)\n",
+        "train_size = int(0.8 * len(train_dataset))\n",
+        "val_size = len(train_dataset) - train_size\n",
+        "train_subset, val_subset = random_split(train_dataset, [train_size, val_size])\n",
+        "\n",
+        "# Create DataLoaders\n",
+        "batch_size = 64\n",
+        "train_loader = DataLoader(train_subset, batch_size=batch_size, shuffle=True)\n",
+        "val_loader = DataLoader(val_subset, batch_size=batch_size, shuffle=False)\n",
+        "test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)\n",
+        "\n",
+        "print(f\"Training samples: {len(train_subset)}\")\n",
+        "print(f\"Validation samples: {len(val_subset)}\")\n",
+        "print(f\"Test samples: {len(test_dataset)}\")"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Step 3: Model Implementation\n",
+        "\n",
+        "Implement a feedforward neural network with:\n",
+        "- Input layer: 784 units (28×28 flattened)\n",
+        "- Hidden layers: 2 layers with 256 units each\n",
+        "- Dropout layers: Applied after each hidden layer (configurable rate)\n",
+        "- Output layer: 10 units (one per digit class)\n",
+        "- Activation: ReLU for hidden layers"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 4,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "class FeedforwardNN(nn.Module):\n",
+        "    def __init__(self, dropout_rate=0.0):\n",
+        "        super(FeedforwardNN, self).__init__()\n",
+        "        self.fc1 = nn.Linear(28 * 28, 256)\n",
+        "        self.dropout1 = nn.Dropout(dropout_rate)\n",
+        "        self.fc2 = nn.Linear(256, 256)\n",
+        "        self.dropout2 = nn.Dropout(dropout_rate)\n",
+        "        self.fc3 = nn.Linear(256, 10)\n",
+        "        self.relu = nn.ReLU()\n",
+        "    \n",
+        "    def forward(self, x):\n",
+        "        x = x.view(x.size(0), -1)  # Flatten\n",
+        "        x = self.relu(self.fc1(x))\n",
+        "        x = self.dropout1(x)\n",
+        "        x = self.relu(self.fc2(x))\n",
+        "        x = self.dropout2(x)\n",
+        "        x = self.fc3(x)\n",
+        "        return x"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Step 4: Training\n",
+        "\n",
+        "Train models with different dropout rates:\n",
+        "- Dropout rates: [0.0, 0.2, 0.3, 0.5, 0.7]\n",
+        "- Loss function: CrossEntropyLoss\n",
+        "- Optimizer: Adam with learning rate 0.001\n",
+        "- Epochs: 20\n",
+        "- Track training and validation loss at each epoch"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 5,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "def train_model(model, train_loader, val_loader, epochs=20, lr=0.001):\n",
+        "    criterion = nn.CrossEntropyLoss()\n",
+        "    optimizer = optim.Adam(model.parameters(), lr=lr)\n",
+        "    \n",
+        "    train_losses = []\n",
+        "    val_losses = []\n",
+        "    \n",
+        "    for epoch in range(epochs):\n",
+        "        # Training phase\n",
+        "        model.train()\n",
+        "        train_loss = 0.0\n",
+        "        for images, labels in train_loader:\n",
+        "            optimizer.zero_grad()\n",
+        "            outputs = model(images)\n",
+        "            loss = criterion(outputs, labels)\n",
+        "            loss.backward()\n",
+        "            optimizer.step()\n",
+        "            train_loss += loss.item()\n",
+        "        \n",
+        "        train_loss /= len(train_loader)\n",
+        "        train_losses.append(train_loss)\n",
+        "        \n",
+        "        # Validation phase\n",
+        "        model.eval()\n",
+        "        val_loss = 0.0\n",
+        "        with torch.no_grad():\n",
+        "            for images, labels in val_loader:\n",
+        "                outputs = model(images)\n",
+        "                loss = criterion(outputs, labels)\n",
+        "                val_loss += loss.item()\n",
+        "        \n",
+        "        val_loss /= len(val_loader)\n",
+        "        val_losses.append(val_loss)\n",
+        "        \n",
+        "        if (epoch + 1) % 5 == 0:\n",
+        "            print(f\"Epoch [{epoch + 1}/{epochs}], Train Loss: {train_loss:.4f}, Val Loss: {val_loss:.4f}\")\n",
+        "    \n",
+        "    return train_losses, val_losses"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 6,
+      "metadata": {},
+      "outputs": [
+        {
+          "name": "stdout",
+          "output_type": "stream",
+          "text": [
+            "\n",
+            "Training model with dropout rate: 0.0\n",
+            "Epoch [5/20], Train Loss: 0.0521, Val Loss: 0.0982\n",
+            "Epoch [10/20], Train Loss: 0.0198, Val Loss: 0.1043\n",
+            "Epoch [15/20], Train Loss: 0.0089, Val Loss: 0.1189\n",
+            "Epoch [20/20], Train Loss: 0.0051, Val Loss: 0.1298\n",
+            "\n",
+            "Training model with dropout rate: 0.2\n",
+            "Epoch [5/20], Train Loss: 0.1156, Val Loss: 0.1034\n",
+            "Epoch [10/20], Train Loss: 0.0721, Val Loss: 0.0892\n",
+            "Epoch [15/20], Train Loss: 0.0573, Val Loss: 0.0831\n",
+            "Epoch [20/20], Train Loss: 0.0476, Val Loss: 0.0785\n",
+            "\n",
+            "Training model with dropout rate: 0.3\n",
+            "Epoch [5/20], Train Loss: 0.1389, Val Loss: 0.1098\n",
+            "Epoch [10/20], Train Loss: 0.0921, Val Loss: 0.0945\n",
+            "Epoch [15/20], Train Loss: 0.0748, Val Loss: 0.0876\n",
+            "Epoch [20/20], Train Loss: 0.0634, Val Loss: 0.0823\n",
+            "\n",
+            "Training model with dropout rate: 0.5\n",
+            "Epoch [5/20], Train Loss: 0.2145, Val Loss: 0.1523\n",
+            "Epoch [10/20], Train Loss: 0.1512, Val Loss: 0.1289\n",
+            "Epoch [15/20], Train Loss: 0.1289, Val Loss: 0.1176\n",
+            "Epoch [20/20], Train Loss: 0.1156, Val Loss: 0.1098\n",
+            "\n",
+            "Training model with dropout rate: 0.7\n",
+            "Epoch [5/20], Train Loss: 0.3821, Val Loss: 0.2654\n",
+            "Epoch [10/20], Train Loss: 0.2987, Val Loss: 0.2243\n",
+            "Epoch [15/20], Train Loss: 0.2634, Val Loss: 0.2045\n",
+            "Epoch [20/20], Train Loss: 0.2398, Val Loss: 0.1923\n"
+          ]
+        }
+      ],
+      "source": [
+        "# Train models with different dropout rates\n",
+        "dropout_rates = [0.0, 0.2, 0.3, 0.5, 0.7]\n",
+        "results = {}\n",
+        "\n",
+        "for dropout_rate in dropout_rates:\n",
+        "    print(f\"\\nTraining model with dropout rate: {dropout_rate}\")\n",
+        "    model = FeedforwardNN(dropout_rate=dropout_rate)\n",
+        "    train_losses, val_losses = train_model(model, train_loader, val_loader, epochs=20)\n",
+        "    results[dropout_rate] = {\n",
+        "        'model': model,\n",
+        "        'train_losses': train_losses,\n",
+        "        'val_losses': val_losses\n",
+        "    }"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Step 5: Evaluation\n",
+        "\n",
+        "Analyze results:\n",
+        "- Plot training vs validation loss curves for each dropout rate\n",
+        "- Calculate test accuracy for each model\n",
+        "- Identify the optimal dropout rate based on:\n",
+        "  - Smallest gap between training and validation loss\n",
+        "  - Best validation/test performance\n",
+        "  - Evidence of reduced overfitting"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 7,
+      "metadata": {},
+      "outputs": [
+        {
+          "data": {
+            "image/png": "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AAAAAAAAD++3qfBwAAAAAAgOFHAAAAAAB8AQEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAAAAAAAAAAB8HgEGAAAAAAAAAMDnEWAAAAAAAAAAAHweAQYAAAAAAAAAwOcRYAAAAAAAAAAAfB4BBgAAAAAAAADA5xFgAA

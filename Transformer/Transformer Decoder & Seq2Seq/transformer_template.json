@@ -1,0 +1,258 @@
+{
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "# Problem: Implement Transformer Encoder-Decoder for Machine Translation\n",
+        "\n",
+        "### Problem Statement\n",
+        "You are tasked with implementing a **Transformer-based Encoder-Decoder architecture** for neural machine translation using PyTorch. You will train the model on the **Multi30k dataset** (German-to-English translation) and evaluate its performance using the **BLEU score**.\n",
+        "\n",
+        "### Requirements\n",
+        "1. **Data Acquisition**: Load and preprocess the Multi30k dataset (German → English).\n",
+        "2. **Data Wrangling**: Tokenize text, build vocabularies, and create data loaders.\n",
+        "3. **Model Implementation**: Implement a Transformer Encoder-Decoder from scratch or using PyTorch components.\n",
+        "4. **Training**: Train the model using appropriate loss function and optimizer.\n",
+        "5. **Evaluation**: Calculate BLEU score on the test set.\n",
+        "\n",
+        "### Constraints\n",
+        "- Use the Multi30k dataset for German-English translation.\n",
+        "- Implement key Transformer components (multi-head attention, positional encoding, etc.).\n",
+        "- Use teacher forcing during training.\n",
+        "- Evaluate using BLEU score metric.\n",
+        "\n",
+        "<details>\n",
+        "  <summary>💡 Hint</summary>\n",
+        "  Use torchtext for data loading. Implement positional encoding and multi-head attention mechanisms. Use CrossEntropyLoss and Adam optimizer. For BLEU, use nltk or torchtext metrics.\n",
+        "</details>"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Step 1: Data Acquisition\n",
+        "\n",
+        "Load the **Multi30k dataset** using `torchtext` or download it directly. This dataset contains German-English parallel sentences for translation tasks."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# Import necessary libraries\n",
+        "import torch\n",
+        "import torch.nn as nn\n",
+        "import torch.optim as optim\n",
+        "import math\n",
+        "import spacy\n",
+        "from torchtext.datasets import Multi30k\n",
+        "from torchtext.data.utils import get_tokenizer\n",
+        "from torchtext.vocab import build_vocab_from_iterator\n",
+        "from torch.utils.data import DataLoader\n",
+        "from torch.nn.utils.rnn import pad_sequence\n",
+        "\n",
+        "# Load Multi30k dataset\n",
+        "# TODO: Load training, validation, and test splits"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Step 2: Data Wrangling\n",
+        "\n",
+        "Tokenize the German and English sentences, build vocabularies, and create data loaders with proper padding and batching."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# Define tokenizers for German and English\n",
+        "# TODO: Create tokenizers using spacy or basic tokenizers\n",
+        "\n",
+        "# Build vocabularies\n",
+        "# TODO: Build vocabulary from training data with special tokens (<sos>, <eos>, <pad>, <unk>)\n",
+        "\n",
+        "# Create data loaders\n",
+        "# TODO: Implement collate function for batching and padding\n",
+        "# TODO: Create DataLoader for train, validation, and test sets"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Step 3: Model Implementation\n",
+        "\n",
+        "Implement the Transformer Encoder-Decoder architecture with:\n",
+        "- Positional Encoding\n",
+        "- Multi-Head Attention\n",
+        "- Encoder and Decoder blocks\n",
+        "- Complete Seq2Seq Transformer model"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# Implement Positional Encoding\n",
+        "class PositionalEncoding(nn.Module):\n",
+        "    def __init__(self, d_model, max_len=5000):\n",
+        "        # TODO: Implement positional encoding\n",
+        "        pass\n",
+        "    \n",
+        "    def forward(self, x):\n",
+        "        # TODO: Add positional encoding to input\n",
+        "        pass"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# Implement Transformer Model\n",
+        "class Seq2SeqTransformer(nn.Module):\n",
+        "    def __init__(self, src_vocab_size, tgt_vocab_size, d_model=512, nhead=8, \n",
+        "                 num_encoder_layers=6, num_decoder_layers=6, dim_feedforward=2048, dropout=0.1):\n",
+        "        # TODO: Initialize embeddings, positional encoding, and transformer\n",
+        "        pass\n",
+        "    \n",
+        "    def forward(self, src, tgt, src_mask=None, tgt_mask=None, \n",
+        "                src_padding_mask=None, tgt_padding_mask=None, memory_key_padding_mask=None):\n",
+        "        # TODO: Implement forward pass\n",
+        "        pass\n",
+        "    \n",
+        "    def encode(self, src, src_mask):\n",
+        "        # TODO: Encode source sequence\n",
+        "        pass\n",
+        "    \n",
+        "    def decode(self, tgt, memory, tgt_mask):\n",
+        "        # TODO: Decode target sequence\n",
+        "        pass"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# Helper functions for mask generation\n",
+        "def generate_square_subsequent_mask(sz):\n",
+        "    # TODO: Generate causal mask for decoder\n",
+        "    pass\n",
+        "\n",
+        "def create_mask(src, tgt, pad_idx):\n",
+        "    # TODO: Create all necessary masks\n",
+        "    pass"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Step 4: Training\n",
+        "\n",
+        "Train the Transformer model using:\n",
+        "- **Loss Function**: CrossEntropyLoss (ignore padding index)\n",
+        "- **Optimizer**: Adam with learning rate scheduling\n",
+        "- **Teacher Forcing**: Use target sequences during training"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# Initialize model, loss, and optimizer\n",
+        "# TODO: Create model instance\n",
+        "# TODO: Define loss function (CrossEntropyLoss with ignore_index for padding)\n",
+        "# TODO: Define optimizer (Adam)\n",
+        "\n",
+        "# Training loop\n",
+        "def train_epoch(model, train_loader, optimizer, criterion, device):\n",
+        "    # TODO: Implement training loop for one epoch\n",
+        "    pass\n",
+        "\n",
+        "def evaluate(model, val_loader, criterion, device):\n",
+        "    # TODO: Implement evaluation loop\n",
+        "    pass\n",
+        "\n",
+        "# Train the model\n",
+        "# TODO: Run training loop for multiple epochs"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Step 5: Evaluation\n",
+        "\n",
+        "Evaluate the trained model using **BLEU score** on the test set. Implement greedy decoding or beam search for translation."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# Implement translation function\n",
+        "def translate(model, src_sentence, src_vocab, tgt_vocab, device, max_len=50):\n",
+        "    # TODO: Implement greedy decoding for translation\n",
+        "    pass\n",
+        "\n",
+        "# Calculate BLEU score\n",
+        "def calculate_bleu(model, test_loader, src_vocab, tgt_vocab, device):\n",
+        "    # TODO: Calculate BLEU score on test set\n",
+        "    pass\n",
+        "\n",
+        "# Evaluate and print BLEU score\n",
+        "# TODO: Calculate and display BLEU score"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# Example translations\n",
+        "# TODO: Show sample translations from test set"
+      ]
+    }
+  ],
+  "metadata": {
+    "kernelspec": {
+      "display_name": "Python 3",
+      "language": "python",
+      "name": "python3"
+    },
+    "language_info": {
+      "codemirror_mode": {
+        "name": "ipython",
+        "version": 3
+      },
+      "file_extension": ".py",
+      "mimetype": "text/x-python",
+      "name": "python",
+      "nbconvert_exporter": "python",
+      "pygments_lexer": "ipython3",
+      "version": "3.8.0"
+    }
+  },
+  "nbformat": 4,
+  "nbformat_minor": 4
+}

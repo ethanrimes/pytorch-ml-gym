@@ -1,0 +1,226 @@
+{
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "# Problem: Gradient Clipping Demonstration with RNN on IMDB Dataset\n",
+        "\n",
+        "### Problem Statement\n",
+        "You are tasked with implementing a **Recurrent Neural Network (RNN)** for sentiment classification on the **IMDB Movie Review Dataset**. Your goal is to demonstrate the importance of **gradient clipping** in stabilizing training for recurrent architectures.\n",
+        "\n",
+        "### Requirements\n",
+        "1. **Data Acquisition**:\n",
+        "   - Load the IMDB sentiment dataset using `torchtext` or `tensorflow.keras.datasets`.\n",
+        "   - The dataset contains 50,000 movie reviews labeled as positive or negative.\n",
+        "\n",
+        "2. **Data Preprocessing**:\n",
+        "   - Tokenize the text reviews.\n",
+        "   - Build a vocabulary and convert reviews to sequences of integers.\n",
+        "   - Pad sequences to a fixed length.\n",
+        "   - Create DataLoaders for training and testing.\n",
+        "\n",
+        "3. **Model Implementation**:\n",
+        "   - Implement a simple RNN architecture with:\n",
+        "     - Embedding layer\n",
+        "     - RNN/LSTM layer(s)\n",
+        "     - Fully connected output layer for binary classification\n",
+        "\n",
+        "4. **Training Without Gradient Clipping**:\n",
+        "   - Train the model without gradient clipping.\n",
+        "   - Track and plot the training loss to observe potential instability (exploding gradients).\n",
+        "\n",
+        "5. **Training With Gradient Clipping**:\n",
+        "   - Retrain the model with gradient clipping applied.\n",
+        "   - Use `torch.nn.utils.clip_grad_norm_()` or similar.\n",
+        "   - Track and plot the training loss to demonstrate stabilization.\n",
+        "\n",
+        "6. **Evaluation**:\n",
+        "   - Compare the training curves of both approaches.\n",
+        "   - Evaluate test accuracy for both models.\n",
+        "\n",
+        "### Expected Outcomes\n",
+        "- Visualize the difference in training stability between models with and without gradient clipping.\n",
+        "- Understand how gradient clipping prevents exploding gradients in RNNs.\n",
+        "\n",
+        "<details>\n",
+        "  <summary>💡 Hint</summary>\n",
+        "  Use a simple RNN or LSTM with 1-2 layers. Without gradient clipping, you may observe NaN losses or highly unstable training. Apply `torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)` after `loss.backward()` and before `optimizer.step()`.\n",
+        "</details>"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Step 1: Import Libraries and Load Dataset"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# Import necessary libraries\n",
+        "# TODO: Import torch, torch.nn, torch.optim, datasets library, etc."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# Load IMDB dataset\n",
+        "# TODO: Load the IMDB dataset using keras.datasets or torchtext"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Step 2: Data Preprocessing"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# Preprocess the data\n",
+        "# TODO: Tokenize, build vocabulary, pad sequences\n",
+        "# TODO: Create DataLoader objects for training and testing"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Step 3: Define RNN Model"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# Define the RNN model\n",
+        "class SentimentRNN(nn.Module):\n",
+        "    def __init__(self, vocab_size, embedding_dim, hidden_dim, output_dim):\n",
+        "        # TODO: Initialize embedding, RNN, and fully connected layers\n",
+        "        ...\n",
+        "    \n",
+        "    def forward(self, x):\n",
+        "        # TODO: Implement forward pass\n",
+        "        ..."
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Step 4: Training Without Gradient Clipping"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# Initialize model, loss function, and optimizer\n",
+        "# TODO: Create model instance, define loss and optimizer"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# Training loop WITHOUT gradient clipping\n",
+        "# TODO: Implement training loop, track losses\n",
+        "# Note: Observe potential instability or NaN losses"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Step 5: Training With Gradient Clipping"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# Reinitialize model\n",
+        "# TODO: Create fresh model instance"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# Training loop WITH gradient clipping\n",
+        "# TODO: Implement training loop with torch.nn.utils.clip_grad_norm_()\n",
+        "# TODO: Track losses for comparison"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Step 6: Visualization and Evaluation"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# Plot training loss curves\n",
+        "# TODO: Compare losses with and without gradient clipping"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# Evaluate both models on test set\n",
+        "# TODO: Calculate and compare test accuracy"
+      ]
+    }
+  ],
+  "metadata": {
+    "kernelspec": {
+      "display_name": "Python 3",
+      "language": "python",
+      "name": "python3"
+    },
+    "language_info": {
+      "codemirror_mode": {
+        "name": "ipython",
+        "version": 3
+      },
+      "file_extension": ".py",
+      "mimetype": "text/x-python",
+      "name": "python",
+      "nbconvert_exporter": "python",
+      "pygments_lexer": "ipython3",
+      "version": "3.8.0"
+    }
+  },
+  "nbformat": 4,
+  "nbformat_minor": 4
+}

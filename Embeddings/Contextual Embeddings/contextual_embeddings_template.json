@@ -1,0 +1,319 @@
+{
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "# Problem: Contextual Embeddings with Pretrained Transformers\n",
+        "\n",
+        "### Problem Statement\n",
+        "You are tasked with exploring **contextual embeddings** using a pretrained Transformer model (DistilBERT). Unlike traditional word embeddings (Word2Vec, GloVe) that assign a single fixed vector to each word, Transformer models generate **context-dependent embeddings** where the same word receives different representations based on its surrounding context.\n",
+        "\n",
+        "Your goal is to:\n",
+        "1. Load a pretrained DistilBERT model\n",
+        "2. Extract word embeddings for sentences containing polysemous words (words with multiple meanings)\n",
+        "3. Visualize how the embeddings change based on context\n",
+        "\n",
+        "### Requirements\n",
+        "1. **Use a Pretrained Model**: Load DistilBERT from the Hugging Face Transformers library\n",
+        "2. **Extract Contextual Embeddings**: Process sentences and extract token embeddings\n",
+        "3. **Focus on Polysemy**: Analyze the word \"bank\" in different contexts (financial institution vs. river bank)\n",
+        "4. **Visualize Embeddings**: Use dimensionality reduction (PCA or t-SNE) to visualize embedding differences\n",
+        "\n",
+        "### Context\n",
+        "This exercise demonstrates a key advantage of Transformer models: their ability to capture context-dependent meaning. This is crucial for many NLP tasks including:\n",
+        "- Question answering\n",
+        "- Named entity recognition\n",
+        "- Sentiment analysis\n",
+        "- Machine translation\n",
+        "\n",
+        "<details>\n",
+        "  <summary>💡 Hint</summary>\n",
+        "  Use the `transformers` library from Hugging Face to load DistilBERT. Extract hidden states from the model output. Use the last hidden layer for embeddings. Apply PCA or t-SNE to reduce dimensionality for visualization.\n",
+        "</details>"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Step 1: Setup and Data Preparation\n",
+        "\n",
+        "Install required libraries and prepare example sentences containing the polysemous word \"bank\" in different contexts."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# Install required libraries\n",
+        "# !pip install transformers torch scikit-learn matplotlib numpy\n",
+        "\n",
+        "# Import necessary libraries\n",
+        "import torch\n",
+        "from transformers import DistilBertTokenizer, DistilBertModel\n",
+        "import numpy as np\n",
+        "import matplotlib.pyplot as plt\n",
+        "from sklearn.decomposition import PCA\n",
+        "from sklearn.manifold import TSNE"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# Define example sentences with \"bank\" in different contexts\n",
+        "# TODO: Create a list of sentences where \"bank\" has different meanings\n",
+        "# Include:\n",
+        "# - Financial institution context (at least 3 sentences)\n",
+        "# - River/geographical context (at least 3 sentences)\n",
+        "\n",
+        "sentences = [\n",
+        "    # Add your sentences here\n",
+        "]"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Step 2: Load Pretrained Model\n",
+        "\n",
+        "Load the DistilBERT model and tokenizer from Hugging Face."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# TODO: Load the DistilBERT tokenizer\n",
+        "# Use 'distilbert-base-uncased' as the model name\n",
+        "\n",
+        "tokenizer = ...\n",
+        "\n",
+        "# TODO: Load the DistilBERT model\n",
+        "# Set output_hidden_states=True to access embeddings\n",
+        "\n",
+        "model = ...\n",
+        "\n",
+        "# Set model to evaluation mode\n",
+        "model.eval()"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Step 3: Extract Contextual Embeddings\n",
+        "\n",
+        "Process each sentence and extract the embedding for the word \"bank\"."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# TODO: Create a function to extract embeddings for a specific word in a sentence\n",
+        "# The function should:\n",
+        "# 1. Tokenize the sentence\n",
+        "# 2. Find the token index of the target word\n",
+        "# 3. Pass the tokens through the model\n",
+        "# 4. Extract the embedding from the last hidden layer\n",
+        "# 5. Return the embedding vector\n",
+        "\n",
+        "def extract_word_embedding(sentence, target_word, tokenizer, model):\n",
+        "    \"\"\"\n",
+        "    Extract contextual embedding for a target word in a sentence.\n",
+        "    \n",
+        "    Args:\n",
+        "        sentence: Input sentence string\n",
+        "        target_word: Word to extract embedding for\n",
+        "        tokenizer: Pretrained tokenizer\n",
+        "        model: Pretrained model\n",
+        "    \n",
+        "    Returns:\n",
+        "        embedding: numpy array of shape (hidden_size,)\n",
+        "    \"\"\"\n",
+        "    # Your implementation here\n",
+        "    pass"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# TODO: Extract embeddings for \"bank\" in all sentences\n",
+        "# Store embeddings in a list along with context labels\n",
+        "\n",
+        "embeddings = []\n",
+        "labels = []  # 'financial' or 'geographical'\n",
+        "\n",
+        "# Your implementation here"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Step 4: Dimensionality Reduction\n",
+        "\n",
+        "Reduce the high-dimensional embeddings to 2D for visualization using PCA or t-SNE."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# TODO: Apply PCA to reduce embeddings to 2 dimensions\n",
+        "# Convert embeddings list to numpy array first\n",
+        "\n",
+        "embeddings_array = np.array(embeddings)\n",
+        "\n",
+        "# Apply PCA\n",
+        "pca = ...\n",
+        "embeddings_2d_pca = ...\n",
+        "\n",
+        "print(f\"Original embedding shape: {embeddings_array.shape}\")\n",
+        "print(f\"Reduced embedding shape: {embeddings_2d_pca.shape}\")"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# TODO: Optionally apply t-SNE for comparison\n",
+        "# t-SNE often provides better separation for visualization\n",
+        "\n",
+        "tsne = ...\n",
+        "embeddings_2d_tsne = ..."
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Step 5: Visualization\n",
+        "\n",
+        "Create scatter plots to visualize how embeddings cluster based on context."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# TODO: Create visualization function\n",
+        "# Plot embeddings with different colors for different contexts\n",
+        "\n",
+        "def plot_embeddings(embeddings_2d, labels, title, method_name):\n",
+        "    \"\"\"\n",
+        "    Plot 2D embeddings with color coding by label.\n",
+        "    \n",
+        "    Args:\n",
+        "        embeddings_2d: 2D array of shape (n_samples, 2)\n",
+        "        labels: List of context labels\n",
+        "        title: Plot title\n",
+        "        method_name: Dimensionality reduction method name\n",
+        "    \"\"\"\n",
+        "    # Your implementation here\n",
+        "    pass"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# TODO: Create visualizations for both PCA and t-SNE\n",
+        "# Use a figure with 2 subplots\n",
+        "\n",
+        "fig, axes = plt.subplots(1, 2, figsize=(15, 6))\n",
+        "\n",
+        "# Plot PCA results\n",
+        "# Your code here\n",
+        "\n",
+        "# Plot t-SNE results\n",
+        "# Your code here\n",
+        "\n",
+        "plt.tight_layout()\n",
+        "plt.show()"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Step 6: Analysis\n",
+        "\n",
+        "Analyze the results and compute similarity metrics."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# TODO: Calculate cosine similarity between embeddings\n",
+        "# Compare:\n",
+        "# 1. Within-context similarity (financial vs financial, geographical vs geographical)\n",
+        "# 2. Cross-context similarity (financial vs geographical)\n",
+        "\n",
+        "from sklearn.metrics.pairwise import cosine_similarity\n",
+        "\n",
+        "# Your implementation here"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Expected Observations\n",
+        "\n",
+        "After completing this exercise, you should observe:\n",
+        "1. **Contextual Separation**: Embeddings for \"bank\" in financial contexts should cluster separately from geographical contexts\n",
+        "2. **Higher Within-Context Similarity**: Embeddings of \"bank\" in similar contexts should have higher cosine similarity\n",
+        "3. **Lower Cross-Context Similarity**: Embeddings across different meanings should have lower similarity\n",
+        "\n",
+        "This demonstrates that Transformer models capture contextual meaning, unlike static word embeddings."
+      ]
+    }
+  ],
+  "metadata": {
+    "kernelspec": {
+      "display_name": "Python 3",
+      "language": "python",
+      "name": "python3"
+    },
+    "language_info": {
+      "codemirror_mode": {
+        "name": "ipython",
+        "version": 3
+      },
+      "file_extension": ".py",
+      "mimetype": "text/x-python",
+      "name": "python",
+      "nbconvert_exporter": "python",
+      "pygments_lexer": "ipython3",
+      "version": "3.8.0"
+    }
+  },
+  "nbformat": 4,
+  "nbformat_minor": 4
+}

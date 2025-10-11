@@ -1,0 +1,306 @@
+{
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "# Problem: Backpropagation Through Time (BPTT) From Scratch\n",
+        "\n",
+        "### Problem Statement\n",
+        "You are tasked with implementing **Backpropagation Through Time (BPTT)** manually for a character-level sequence prediction task. Instead of using PyTorch's built-in `nn.RNN`, you must implement a vanilla RNN cell and the BPTT algorithm from scratch to understand how gradients flow through time.\n",
+        "\n",
+        "Your implementation will work on a simple text dataset (\"hello world\") to predict the next character in a sequence. You will:\n",
+        "1. Build a vanilla RNN from scratch\n",
+        "2. Implement manual BPTT\n",
+        "3. Track and visualize gradient magnitudes over time\n",
+        "4. Demonstrate the vanishing and exploding gradient problems\n",
+        "\n",
+        "### Requirements\n",
+        "1. **Data Acquisition**: Use a toy text dataset (\"hello world\" repeated)\n",
+        "2. **Data Preprocessing**: Convert characters to one-hot encodings\n",
+        "3. **Model Implementation**: \n",
+        "   - Implement a vanilla RNN cell without using `nn.RNN`\n",
+        "   - Implement forward pass through time\n",
+        "   - Implement backward pass through time (BPTT) manually\n",
+        "4. **Training**: Train the model and track gradient magnitudes\n",
+        "5. **Analysis**: Demonstrate vanishing/exploding gradients with visualizations\n",
+        "\n",
+        "### Learning Objectives\n",
+        "- Understand the inner workings of RNNs and temporal dependencies\n",
+        "- Implement gradient computation across time steps\n",
+        "- Identify and diagnose gradient stability issues\n",
+        "- Appreciate why LSTM/GRU architectures were developed\n",
+        "\n",
+        "<details>\n",
+        "  <summary>💡 Hint</summary>\n",
+        "  - Define weight matrices for input-to-hidden (Wxh), hidden-to-hidden (Whh), and hidden-to-output (Why)\n",
+        "  - In the forward pass, maintain a list of hidden states for each time step\n",
+        "  - In the backward pass, compute gradients by traversing time steps in reverse\n",
+        "  - Track the norm of gradients at each time step to observe vanishing/exploding behavior\n",
+        "  - Experiment with different weight initializations to trigger different gradient behaviors\n",
+        "</details>"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Step 1: Data Acquisition and Preprocessing\n",
+        "\n",
+        "Create a toy text dataset and convert it to numerical representations."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "import numpy as np\n",
+        "import matplotlib.pyplot as plt\n",
+        "from collections import defaultdict\n",
+        "\n",
+        "# TODO: Define the toy text dataset\n",
+        "# Hint: Use a simple repeated phrase like \"hello world \"\n",
+        "text = ...\n",
+        "\n",
+        "# TODO: Create character-to-index and index-to-character mappings\n",
+        "chars = ...\n",
+        "char_to_idx = ...\n",
+        "idx_to_char = ...\n",
+        "\n",
+        "# TODO: Convert text to indices\n",
+        "data = ...\n",
+        "\n",
+        "print(f\"Text: {text}\")\n",
+        "print(f\"Vocabulary size: {len(chars)}\")\n",
+        "print(f\"Data length: {len(data)}\")"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Step 2: Implement Vanilla RNN Cell\n",
+        "\n",
+        "Implement the forward pass of a vanilla RNN without using PyTorch's `nn.RNN`."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "class VanillaRNN:\n",
+        "    def __init__(self, input_size, hidden_size, output_size, learning_rate=0.01, init_scale=0.01):\n",
+        "        \"\"\"\n",
+        "        Initialize the RNN parameters.\n",
+        "        \n",
+        "        Args:\n",
+        "            input_size: Size of input vocabulary\n",
+        "            hidden_size: Size of hidden state\n",
+        "            output_size: Size of output vocabulary\n",
+        "            learning_rate: Learning rate for parameter updates\n",
+        "            init_scale: Scale for weight initialization\n",
+        "        \"\"\"\n",
+        "        # TODO: Initialize weight matrices\n",
+        "        # Wxh: input to hidden\n",
+        "        # Whh: hidden to hidden\n",
+        "        # Why: hidden to output\n",
+        "        # bh: hidden bias\n",
+        "        # by: output bias\n",
+        "        \n",
+        "        self.Wxh = ...\n",
+        "        self.Whh = ...\n",
+        "        self.Why = ...\n",
+        "        self.bh = ...\n",
+        "        self.by = ...\n",
+        "        \n",
+        "        self.learning_rate = learning_rate\n",
+        "        \n",
+        "    def forward(self, inputs, h_prev):\n",
+        "        \"\"\"\n",
+        "        Forward pass through time.\n",
+        "        \n",
+        "        Args:\n",
+        "            inputs: List of input indices for each time step\n",
+        "            h_prev: Initial hidden state\n",
+        "            \n",
+        "        Returns:\n",
+        "            outputs: List of output distributions for each time step\n",
+        "            hidden_states: List of hidden states for each time step\n",
+        "        \"\"\"\n",
+        "        # TODO: Implement forward pass\n",
+        "        # For each time step:\n",
+        "        #   1. Convert input to one-hot\n",
+        "        #   2. Compute hidden state: h_t = tanh(Wxh @ x_t + Whh @ h_{t-1} + bh)\n",
+        "        #   3. Compute output: y_t = Why @ h_t + by\n",
+        "        #   4. Apply softmax to get probabilities\n",
+        "        \n",
+        "        ...\n",
+        "        \n",
+        "    def backward(self, inputs, targets, hidden_states, outputs):\n",
+        "        \"\"\"\n",
+        "        Backward pass through time (BPTT).\n",
+        "        \n",
+        "        Args:\n",
+        "            inputs: List of input indices\n",
+        "            targets: List of target indices\n",
+        "            hidden_states: List of hidden states from forward pass\n",
+        "            outputs: List of output distributions from forward pass\n",
+        "            \n",
+        "        Returns:\n",
+        "            loss: Cross-entropy loss\n",
+        "            gradient_norms: List of gradient norms at each time step\n",
+        "        \"\"\"\n",
+        "        # TODO: Implement BPTT\n",
+        "        # 1. Initialize gradient accumulators\n",
+        "        # 2. Compute output gradients (cross-entropy)\n",
+        "        # 3. Backpropagate through time\n",
+        "        # 4. Clip gradients to prevent explosion\n",
+        "        # 5. Update parameters\n",
+        "        # 6. Track gradient norms for analysis\n",
+        "        \n",
+        "        ..."
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Step 3: Training Loop with Gradient Tracking\n",
+        "\n",
+        "Train the RNN and track gradient magnitudes over time."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# TODO: Initialize the RNN\n",
+        "# Experiment with different initialization scales\n",
+        "rnn = ...\n",
+        "\n",
+        "# TODO: Training parameters\n",
+        "seq_length = ...  # Length of sequences to process\n",
+        "num_iterations = ...\n",
+        "\n",
+        "# TODO: Storage for gradient analysis\n",
+        "all_gradient_norms = []\n",
+        "\n",
+        "# TODO: Implement training loop\n",
+        "# For each iteration:\n",
+        "#   1. Sample a sequence from the data\n",
+        "#   2. Forward pass\n",
+        "#   3. Backward pass (BPTT)\n",
+        "#   4. Store gradient norms\n",
+        "#   5. Print loss periodically\n",
+        "\n",
+        "..."
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Step 4: Visualize Gradient Flow\n",
+        "\n",
+        "Analyze and visualize gradient magnitudes across time steps to demonstrate vanishing/exploding gradients."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# TODO: Plot gradient norms over time steps\n",
+        "# Create visualizations showing:\n",
+        "#   1. Gradient norms vs. time step (averaged over iterations)\n",
+        "#   2. Heatmap of gradient norms across iterations and time steps\n",
+        "#   3. Log-scale plot to better see vanishing gradients\n",
+        "\n",
+        "..."
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Step 5: Demonstrate Vanishing and Exploding Gradients\n",
+        "\n",
+        "Experiment with different weight initializations to trigger different gradient behaviors."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# TODO: Test with small initialization (vanishing gradients)\n",
+        "print(\"Testing with small weight initialization...\")\n",
+        "rnn_vanishing = ...\n",
+        "# Train and collect gradient norms\n",
+        "...\n",
+        "\n",
+        "# TODO: Test with large initialization (exploding gradients)\n",
+        "print(\"Testing with large weight initialization...\")\n",
+        "rnn_exploding = ...\n",
+        "# Train and collect gradient norms\n",
+        "...\n",
+        "\n",
+        "# TODO: Compare gradient behaviors\n",
+        "# Create side-by-side plots showing vanishing vs. exploding gradients\n",
+        "..."
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Step 6: Analysis and Conclusions\n",
+        "\n",
+        "Summarize findings about gradient flow in vanilla RNNs."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# TODO: Print summary statistics\n",
+        "# - Average gradient norm at different time lags\n",
+        "# - Rate of gradient decay/growth\n",
+        "# - Discussion of implications for learning long-term dependencies\n",
+        "\n",
+        "..."
+      ]
+    }
+  ],
+  "metadata": {
+    "kernelspec": {
+      "display_name": "Python 3",
+      "language": "python",
+      "name": "python3"
+    },
+    "language_info": {
+      "codemirror_mode": {
+        "name": "ipython",
+        "version": 3
+      },
+      "file_extension": ".py",
+      "mimetype": "text/x-python",
+      "name": "python",
+      "nbconvert_exporter": "python",
+      "pygments_lexer": "ipython3",
+      "version": "3.8.0"
+    }
+  },
+  "nbformat": 4,
+  "nbformat_minor": 4
+}

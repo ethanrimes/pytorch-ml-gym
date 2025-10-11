@@ -1,0 +1,210 @@
+{
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "# Problem: Vanishing/Exploding Gradients Visualization in LSTMs\n",
+        "\n",
+        "## Problem Statement\n",
+        "You are tasked with investigating the **vanishing and exploding gradient problem** in recurrent neural networks by training an LSTM on long sequences. Your goal is to:\n",
+        "\n",
+        "1. Generate a synthetic sequence dataset suitable for demonstrating gradient behavior\n",
+        "2. Implement an LSTM model to process long sequences\n",
+        "3. Track gradient norms during backpropagation through time\n",
+        "4. Visualize gradient flow patterns across timesteps\n",
+        "5. Compare gradient behavior in LSTM vs vanilla RNN (optional extension)\n",
+        "\n",
+        "## Learning Objectives\n",
+        "- Understand how gradients flow through recurrent architectures\n",
+        "- Observe the vanishing/exploding gradient phenomenon empirically\n",
+        "- Learn gradient tracking and visualization techniques\n",
+        "- Appreciate why LSTMs help mitigate gradient problems\n",
+        "\n",
+        "## Requirements\n",
+        "- Use PyTorch for implementation\n",
+        "- Create synthetic sequences of length 50-100 timesteps\n",
+        "- Track gradients at each timestep during training\n",
+        "- Generate visualizations showing gradient norms over time\n",
+        "- Document observations about gradient behavior\n",
+        "\n",
+        "<details>\n",
+        "  <summary>💡 Hint</summary>\n",
+        "  Use `register_hook()` on LSTM hidden states to capture gradients during backpropagation. Store gradient norms in a list and plot them to observe patterns. Consider using a task where early timesteps influence the final output to maximize gradient flow.\n",
+        "</details>"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Step 1: Import Libraries and Setup"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# Import necessary libraries\n",
+        "# TODO: Import torch, numpy, matplotlib, and other required libraries"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Step 2: Generate Synthetic Sequential Data\n",
+        "\n",
+        "Create a synthetic dataset where:\n",
+        "- Sequences have length 50-100 timesteps\n",
+        "- Early timesteps contain information critical for the final prediction\n",
+        "- This design will help demonstrate gradient flow from output back to early inputs\n",
+        "\n",
+        "**Suggested Task**: Long-term dependency task where a signal at timestep t=5 determines the correct output at t=100"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# Generate synthetic sequence data\n",
+        "# TODO: Create function to generate sequences with long-term dependencies"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Step 3: Implement LSTM Model with Gradient Tracking\n",
+        "\n",
+        "Create an LSTM model that:\n",
+        "- Processes variable-length sequences\n",
+        "- Allows gradient tracking at each timestep\n",
+        "- Uses hooks to capture gradient information during backpropagation"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# Define LSTM model with gradient tracking capability\n",
+        "# TODO: Implement LSTMModel class with gradient hooks"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Step 4: Training Loop with Gradient Monitoring\n",
+        "\n",
+        "Implement a training loop that:\n",
+        "- Trains the LSTM on the synthetic dataset\n",
+        "- Captures gradient norms at each timestep\n",
+        "- Stores gradient statistics for later visualization\n",
+        "- Uses appropriate loss function and optimizer"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# Training loop with gradient tracking\n",
+        "# TODO: Implement training with gradient norm collection"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Step 5: Visualize Gradient Flow\n",
+        "\n",
+        "Create visualizations showing:\n",
+        "- Gradient norms across timesteps\n",
+        "- Evolution of gradient patterns during training\n",
+        "- Comparison of gradient behavior in early vs late training\n",
+        "- Heatmap of gradient magnitudes"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# Visualize gradient norms\n",
+        "# TODO: Create plots showing gradient behavior across timesteps"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Step 6: Analysis and Observations\n",
+        "\n",
+        "Document your findings:\n",
+        "- Do gradients vanish for early timesteps?\n",
+        "- Are there any exploding gradient patterns?\n",
+        "- How does the LSTM's gating mechanism affect gradient flow?\n",
+        "- What patterns emerge during training?"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# Analysis and observations\n",
+        "# TODO: Add code to compute statistics and generate summary visualizations"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Optional Extension: Compare with Vanilla RNN\n",
+        "\n",
+        "Implement a vanilla RNN and compare gradient behavior to demonstrate why LSTMs were developed."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# Optional: Vanilla RNN comparison\n",
+        "# TODO: Implement vanilla RNN and compare gradient patterns"
+      ]
+    }
+  ],
+  "metadata": {
+    "kernelspec": {
+      "display_name": "Python 3",
+      "language": "python",
+      "name": "python3"
+    },
+    "language_info": {
+      "codemirror_mode": {
+        "name": "ipython",
+        "version": 3
+      },
+      "file_extension": ".py",
+      "mimetype": "text/x-python",
+      "name": "python",
+      "nbconvert_exporter": "python",
+      "pygments_lexer": "ipython3",
+      "version": "3.8.0"
+    }
+  },
+  "nbformat": 4,
+  "nbformat_minor": 4
+}

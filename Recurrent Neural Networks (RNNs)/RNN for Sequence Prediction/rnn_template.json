@@ -1,0 +1,258 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Problem: Implement a Vanilla RNN for Sine Wave Sequence Prediction\n",
+    "\n",
+    "### Problem Statement\n",
+    "You are tasked with implementing a **Recurrent Neural Network (RNN)** from scratch to predict the next value in a sine wave sequence. This problem tests your understanding of:\n",
+    "- Time series data generation\n",
+    "- RNN architecture and forward propagation\n",
+    "- Sequence-to-sequence prediction\n",
+    "- Training recurrent networks\n",
+    "- Temporal data visualization\n",
+    "\n",
+    "### Requirements\n",
+    "1. **Generate synthetic sine wave data** for training and testing\n",
+    "2. **Implement a vanilla RNN from scratch** using PyTorch's `nn.Module`\n",
+    "3. **Train the model** to predict the next value given a sequence of previous values\n",
+    "4. **Evaluate performance** and visualize predicted vs. true values\n",
+    "\n",
+    "### Constraints\n",
+    "- Implement the RNN cell from scratch (do not use `nn.RNN`, `nn.LSTM`, or `nn.GRU`)\n",
+    "- Use a sequence length of your choice (e.g., 50 time steps)\n",
+    "- Train for sufficient epochs to demonstrate learning\n",
+    "- Create visualizations comparing predictions to ground truth\n",
+    "\n",
+    "<details>\n",
+    "  <summary>💡 Hint</summary>\n",
+    "  \n",
+    "  **RNN Architecture:**\n",
+    "  - An RNN maintains a hidden state that gets updated at each time step\n",
+    "  - The core equation is: h_t = tanh(W_ih * x_t + W_hh * h_{t-1} + b_h)\n",
+    "  - You'll need weight matrices for input-to-hidden and hidden-to-hidden connections\n",
+    "  \n",
+    "  **Data Preparation:**\n",
+    "  - Generate sine wave: y = sin(x) for x in range [0, multiple periods]\n",
+    "  - Create sliding windows: each sequence of N values predicts the (N+1)th value\n",
+    "  \n",
+    "  **Training Tips:**\n",
+    "  - Use MSE loss for regression\n",
+    "  - Consider gradient clipping to prevent exploding gradients\n",
+    "  - Monitor loss to ensure convergence\n",
+    "</details>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "---\n",
+    "## Step 1: Data Acquisition and Generation\n",
+    "\n",
+    "**Task:** Generate a synthetic sine wave dataset for training and testing.\n",
+    "\n",
+    "**Requirements:**\n",
+    "- Create a sine wave with multiple periods (e.g., 4-5 periods)\n",
+    "- Generate at least 1000 time steps\n",
+    "- Split into training and testing sets (80/20 split)\n",
+    "- Visualize the generated sine wave"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import torch\n",
+    "import torch.nn as nn\n",
+    "import torch.optim as optim\n",
+    "import numpy as np\n",
+    "import matplotlib.pyplot as plt"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# TODO: Generate sine wave data\n",
+    "# - Create time points\n",
+    "# - Generate sine wave values\n",
+    "# - Split into train and test sets\n",
+    "# - Visualize the data"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "---\n",
+    "## Step 2: Data Preprocessing\n",
+    "\n",
+    "**Task:** Create sequences from the sine wave data for supervised learning.\n",
+    "\n",
+    "**Requirements:**\n",
+    "- Create sliding window sequences (e.g., use 50 previous values to predict the next value)\n",
+    "- Normalize the data if needed\n",
+    "- Convert to PyTorch tensors\n",
+    "- Create DataLoader objects for batching"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# TODO: Create sequence dataset\n",
+    "# - Define sequence length\n",
+    "# - Create input sequences and target values\n",
+    "# - Convert to tensors\n",
+    "# - Create DataLoader"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "---\n",
+    "## Step 3: Model Implementation\n",
+    "\n",
+    "**Task:** Implement a vanilla RNN from scratch.\n",
+    "\n",
+    "**Requirements:**\n",
+    "- Create a custom `VanillaRNN` class inheriting from `nn.Module`\n",
+    "- Implement the RNN cell with:\n",
+    "  - Input-to-hidden weights\n",
+    "  - Hidden-to-hidden weights\n",
+    "  - Bias terms\n",
+    "  - Tanh activation\n",
+    "- Implement forward pass that:\n",
+    "  - Processes sequences time step by time step\n",
+    "  - Maintains hidden state across time steps\n",
+    "  - Returns predictions\n",
+    "- Add a linear output layer to produce final predictions"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "class VanillaRNN(nn.Module):\n",
+    "    def __init__(self, input_size, hidden_size, output_size):\n",
+    "        super(VanillaRNN, self).__init__()\n",
+    "        # TODO: Initialize parameters\n",
+    "        # - Weight matrix for input to hidden (W_ih)\n",
+    "        # - Weight matrix for hidden to hidden (W_hh)\n",
+    "        # - Bias for hidden layer\n",
+    "        # - Output layer (hidden to output)\n",
+    "        pass\n",
+    "    \n",
+    "    def forward(self, x, hidden):\n",
+    "        # TODO: Implement forward pass\n",
+    "        # - Process each time step\n",
+    "        # - Update hidden state: h_t = tanh(W_ih * x_t + W_hh * h_{t-1} + b)\n",
+    "        # - Generate output from final hidden state\n",
+    "        pass\n",
+    "    \n",
+    "    def init_hidden(self, batch_size):\n",
+    "        # TODO: Initialize hidden state (zeros)\n",
+    "        pass"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "---\n",
+    "## Step 4: Training\n",
+    "\n",
+    "**Task:** Train the RNN model on the sine wave sequences.\n",
+    "\n",
+    "**Requirements:**\n",
+    "- Use Mean Squared Error (MSE) loss\n",
+    "- Use Adam optimizer\n",
+    "- Implement gradient clipping to prevent exploding gradients\n",
+    "- Train for sufficient epochs (e.g., 100-200)\n",
+    "- Track and plot training loss"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# TODO: Initialize model, loss function, and optimizer\n",
+    "# TODO: Implement training loop\n",
+    "#   - Forward pass\n",
+    "#   - Compute loss\n",
+    "#   - Backward pass\n",
+    "#   - Gradient clipping\n",
+    "#   - Optimizer step\n",
+    "#   - Track loss\n",
+    "# TODO: Plot training loss over epochs"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "---\n",
+    "## Step 5: Evaluation and Visualization\n",
+    "\n",
+    "**Task:** Evaluate the trained model and visualize predictions.\n",
+    "\n",
+    "**Requirements:**\n",
+    "- Make predictions on test set\n",
+    "- Calculate test MSE\n",
+    "- Create visualizations:\n",
+    "  - Predicted vs. actual values over time\n",
+    "  - Prediction errors\n",
+    "  - Multi-step ahead predictions (optional)\n",
+    "- Analyze model performance"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# TODO: Evaluate on test set\n",
+    "# - Generate predictions\n",
+    "# - Calculate test MSE\n",
+    "# - Create comparison plots\n",
+    "# - Visualize prediction errors"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.8.0"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 4
+}

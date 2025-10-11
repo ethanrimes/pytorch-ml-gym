@@ -1,0 +1,232 @@
+{
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "# Problem: Dropout Regularization in Feedforward Neural Networks\n",
+        "\n",
+        "## Problem Statement\n",
+        "You are tasked with investigating the effect of **dropout regularization** on the generalization performance of feedforward neural networks. Using the **MNIST** dataset, you will:\n",
+        "\n",
+        "1. Implement a feedforward neural network for digit classification\n",
+        "2. Train multiple models with different dropout rates (0.0, 0.2, 0.3, 0.5, 0.7)\n",
+        "3. Compare training and validation loss curves to identify overfitting\n",
+        "4. Determine the optimal dropout rate for best generalization\n",
+        "\n",
+        "### Learning Objectives\n",
+        "- Understand how dropout prevents overfitting\n",
+        "- Analyze the tradeoff between model capacity and regularization\n",
+        "- Interpret training dynamics through loss curves\n",
+        "- Select hyperparameters based on validation performance\n",
+        "\n",
+        "### Requirements\n",
+        "1. **Data Acquisition**: Load and preprocess the MNIST dataset\n",
+        "2. **Data Wrangling**: Normalize pixel values and create train/validation splits\n",
+        "3. **Model Implementation**: Build a feedforward network with configurable dropout\n",
+        "4. **Training**: Train models with various dropout rates using cross-entropy loss\n",
+        "5. **Evaluation**: Plot loss curves and compare test accuracies\n",
+        "\n",
+        "<details>\n",
+        "  <summary>💡 Hint</summary>\n",
+        "  Use `nn.Dropout()` layers between fully connected layers. Remember that dropout behaves differently during training vs evaluation (use `model.train()` and `model.eval()`). Track both training and validation losses at each epoch for plotting.\n",
+        "</details>"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Step 1: Data Acquisition\n",
+        "\n",
+        "Load the **MNIST** dataset using `torchvision.datasets`. This dataset contains 70,000 grayscale images of handwritten digits (0-9), each 28×28 pixels."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "import torch\n",
+        "import torch.nn as nn\n",
+        "import torch.optim as optim\n",
+        "import torchvision\n",
+        "import torchvision.transforms as transforms\n",
+        "from torch.utils.data import DataLoader, random_split\n",
+        "import matplotlib.pyplot as plt\n",
+        "import numpy as np"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# TODO: Load MNIST dataset\n",
+        "# Use transforms.ToTensor() to convert images to tensors\n",
+        "# Download train=True and train=False datasets"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Step 2: Data Wrangling\n",
+        "\n",
+        "Preprocess the data:\n",
+        "- Normalize pixel values to [0, 1] range (done automatically by ToTensor)\n",
+        "- Split training data into train and validation sets (80/20 split)\n",
+        "- Create DataLoaders with appropriate batch size"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# TODO: Split training dataset into train and validation\n",
+        "# Use random_split with 80/20 ratio\n",
+        "# Create DataLoaders with batch_size=64"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Step 3: Model Implementation\n",
+        "\n",
+        "Implement a feedforward neural network with:\n",
+        "- Input layer: 784 units (28×28 flattened)\n",
+        "- Hidden layers: 2 layers with 256 units each\n",
+        "- Dropout layers: Applied after each hidden layer (configurable rate)\n",
+        "- Output layer: 10 units (one per digit class)\n",
+        "- Activation: ReLU for hidden layers"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "class FeedforwardNN(nn.Module):\n",
+        "    def __init__(self, dropout_rate=0.0):\n",
+        "        # TODO: Define layers with dropout\n",
+        "        pass\n",
+        "    \n",
+        "    def forward(self, x):\n",
+        "        # TODO: Implement forward pass\n",
+        "        # Remember to flatten input and apply dropout\n",
+        "        pass"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Step 4: Training\n",
+        "\n",
+        "Train models with different dropout rates:\n",
+        "- Dropout rates: [0.0, 0.2, 0.3, 0.5, 0.7]\n",
+        "- Loss function: CrossEntropyLoss\n",
+        "- Optimizer: Adam with learning rate 0.001\n",
+        "- Epochs: 20\n",
+        "- Track training and validation loss at each epoch"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "def train_model(model, train_loader, val_loader, epochs=20):\n",
+        "    # TODO: Implement training loop\n",
+        "    # Return lists of training and validation losses\n",
+        "    pass"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# TODO: Train models with different dropout rates\n",
+        "# Store results in a dictionary for comparison"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Step 5: Evaluation\n",
+        "\n",
+        "Analyze results:\n",
+        "- Plot training vs validation loss curves for each dropout rate\n",
+        "- Calculate test accuracy for each model\n",
+        "- Identify the optimal dropout rate based on:\n",
+        "  - Smallest gap between training and validation loss\n",
+        "  - Best validation/test performance\n",
+        "  - Evidence of reduced overfitting"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# TODO: Plot training and validation loss curves\n",
+        "# Create subplots for each dropout rate"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# TODO: Evaluate test accuracy for each model\n",
+        "# Print comparison table"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Conclusion\n",
+        "\n",
+        "Based on your results:\n",
+        "- Which dropout rate provided the best generalization?\n",
+        "- How did dropout affect the gap between training and validation loss?\n",
+        "- What happened with very high dropout rates (0.7)?\n",
+        "- What tradeoffs did you observe?"
+      ]
+    }
+  ],
+  "metadata": {
+    "kernelspec": {
+      "display_name": "Python 3",
+      "language": "python",
+      "name": "python3"
+    },
+    "language_info": {
+      "codemirror_mode": {
+        "name": "ipython",
+        "version": 3
+      },
+      "file_extension": ".py",
+      "mimetype": "text/x-python",
+      "name": "python",
+      "nbconvert_exporter": "python",
+      "pygments_lexer": "ipython3",
+      "version": "3.10.0"
+    }
+  },
+  "nbformat": 4,
+  "nbformat_minor": 4
+}

@@ -1,0 +1,255 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Problem: Implement Word2Vec Skip-Gram with Negative Sampling from Scratch\n",
+    "\n",
+    "### Problem Statement\n",
+    "You are tasked with implementing the **Word2Vec Skip-Gram model** from scratch using PyTorch. The model should use **negative sampling** for efficient training. After training, you will visualize the learned word embeddings using **t-SNE** to observe semantic relationships between words.\n",
+    "\n",
+    "### Requirements\n",
+    "1. **Data Acquisition**: Use a text corpus for training (we'll use a sample from a public dataset)\n",
+    "2. **Data Wrangling**: Preprocess text data, build vocabulary, and create training pairs\n",
+    "3. **Model Implementation**: Implement Skip-Gram architecture with negative sampling\n",
+    "4. **Training**: Train the model using appropriate loss function and optimizer\n",
+    "5. **Evaluation**: Visualize embeddings using t-SNE and analyze word relationships\n",
+    "\n",
+    "### Constraints\n",
+    "- Implement the Skip-Gram model from scratch (not using pre-built Word2Vec libraries)\n",
+    "- Use negative sampling for training efficiency\n",
+    "- Train on a reasonable text corpus\n",
+    "- Visualize at least 50 words in the embedding space"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Step 1: Data Acquisition\n",
+    "\n",
+    "**Data Source**: We will use the **Text8** dataset, a cleaned version of the first 100MB of Wikipedia text.\n",
+    "- Download from: http://mattmahoney.net/dc/text8.zip\n",
+    "- This is a single large text file with preprocessed Wikipedia articles\n",
+    "- Contains approximately 17 million words"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Import required libraries\n",
+    "import torch\n",
+    "import torch.nn as nn\n",
+    "import torch.optim as optim\n",
+    "import numpy as np\n",
+    "from collections import Counter\n",
+    "import urllib.request\n",
+    "import zipfile\n",
+    "import os\n",
+    "from sklearn.manifold import TSNE\n",
+    "import matplotlib.pyplot as plt"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Download and load the text8 dataset\n",
+    "# TODO: Implement data download and loading"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Step 2: Data Wrangling\n",
+    "\n",
+    "**Required Preprocessing Steps**:\n",
+    "1. Tokenize the text into words\n",
+    "2. Build vocabulary (map words to indices)\n",
+    "3. Remove rare words (appear less than min_count times)\n",
+    "4. Create context-target pairs for Skip-Gram (window-based sampling)\n",
+    "5. Implement subsampling of frequent words\n",
+    "6. Prepare negative sampling distribution"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Build vocabulary and word-to-index mappings\n",
+    "# TODO: Implement vocabulary building with frequency filtering"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Create training pairs (center word, context word)\n",
+    "# TODO: Implement context window sampling"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Prepare negative sampling distribution\n",
+    "# TODO: Implement negative sampling probability distribution (word frequency ^ 0.75)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Step 3: Model Implementation\n",
+    "\n",
+    "**Model Architecture**: Skip-Gram with Negative Sampling\n",
+    "- **Input**: Center word (target word)\n",
+    "- **Output**: Context words prediction\n",
+    "- **Embedding Layer**: Maps words to dense vectors\n",
+    "- **Negative Sampling**: Sample k negative words per positive context word\n",
+    "- **Loss**: Binary cross-entropy for positive and negative samples"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Implement Skip-Gram model with negative sampling\n",
+    "class SkipGramNegSampling(nn.Module):\n",
+    "    def __init__(self, vocab_size, embedding_dim):\n",
+    "        # TODO: Initialize embeddings for center and context words\n",
+    "        pass\n",
+    "    \n",
+    "    def forward(self, center_words, context_words, negative_words):\n",
+    "        # TODO: Implement forward pass with negative sampling\n",
+    "        pass"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Step 4: Training\n",
+    "\n",
+    "**Training Configuration**:\n",
+    "- **Loss Function**: Binary Cross-Entropy Loss\n",
+    "- **Optimizer**: Adam optimizer with learning rate 0.001\n",
+    "- **Hyperparameters**:\n",
+    "  - Embedding dimension: 100\n",
+    "  - Window size: 5\n",
+    "  - Negative samples: 5\n",
+    "  - Min word count: 5\n",
+    "  - Epochs: 5\n",
+    "  - Batch size: 512"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Initialize model and training components\n",
+    "# TODO: Set up model, optimizer, and training loop"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Training loop\n",
+    "# TODO: Implement training with negative sampling"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Step 5: Evaluation and Visualization\n",
+    "\n",
+    "**Evaluation Metrics**:\n",
+    "1. **t-SNE Visualization**: Reduce embeddings to 2D and visualize word clusters\n",
+    "2. **Similarity Analysis**: Find most similar words using cosine similarity\n",
+    "3. **Analogy Testing**: Test word analogies (e.g., king - man + woman ≈ queen)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Extract learned embeddings\n",
+    "# TODO: Get embedding weights from trained model"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Visualize embeddings using t-SNE\n",
+    "# TODO: Apply t-SNE and plot word embeddings"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Find similar words\n",
+    "# TODO: Implement cosine similarity search"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Test word analogies\n",
+    "# TODO: Implement analogy function (e.g., king - man + woman)"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.8.0"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 4
+}
